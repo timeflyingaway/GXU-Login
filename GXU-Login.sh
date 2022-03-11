@@ -33,15 +33,15 @@ check_login() {
   
   if [ -z "$source" ]; then
     #echo "无网络"
-    #logger -t GXU-Login "无网络"
+    #logger -t 【GXU-Login】 "无网络"
     return 2
   elif [ -n "$(echo $source | grep www.baidu.com)" ]; then
     #echo "已联网"
-    #logger -t GXU-Login "已联网"
+    #logger -t 【GXU-Login】 "已联网"
     return 0
   else
     #echo "未联网"
-    #logger -t GXU-Login "未联网"
+    #logger -t 【GXU-Login】 "未联网"
     return 1
   fi
 }

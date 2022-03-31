@@ -9,7 +9,9 @@ password=xxxxxx
 ##运营商，校园网留空，移动“cmcc”，联通“unicom”，电信“telecom”
 isp=telecom
 
+##curl超时时间（s）
 timeout=3
+##最大尝试次数（重启WAN或者重启路由器重置计数）
 max_try=3
 
 restart_wan() {
@@ -47,15 +49,19 @@ check_login() {
 }
 
 get_info() {
+  ##ip:"172.28.x.x"
   ip=$(echo $source | awk -F "<NextURL>" '{print $2}' | awk -F ['&''?'] '{print $2}' | awk -F ['='] '{print $2}')
   #echo $ip
 
+  ##wlanacname:"wlanacname=null"
   wlanacname=$(echo $source | awk -F "<NextURL>" '{print $2}' | awk -F ['&''?'] '{print $3}')
   #echo $wlanacname
 
+  ##wlanacip:"wlanacip=null"
   wlanacip=$(echo $source | awk -F "<NextURL>" '{print $2}' | awk -F ['&''?'] '{print $4}')
   #echo $wlanacip
 
+  ##mac:"00-00-00-00-00-00"
   mac=$(echo $source | awk -F "<NextURL>" '{print $2}' | awk -F ['&''?'] '{print $5}' | cut -b 13-24)
   mac=$(echo $mac | cut -b 1-2)-$(echo $mac | cut -b 3-4)-$(echo $mac | cut -b 5-6)-$(echo $mac | cut -b 7-8)-$(echo $mac | cut -b 9-10)-$(echo $mac | cut -b 11-12)
   #echo $mac
@@ -67,6 +73,7 @@ do_logout() {
 
 do_login() {
   [ -z $err ] && err=0
+  ##断网后，尝试一次直接使用原信息登录，因为此时可能不返回任何网页请求，避免直接重启
   if $(return $changed); then
     if ! check_login; then
       $(return 1)
@@ -76,6 +83,7 @@ do_login() {
   fi
   case $? in
     2)
+    ##重启WAN后，即使无网络仍然尝试，避免重启WAN后直接重启路由器
     $(return $restarted) && err=`expr $err + 1` && [ $err -le $max_try ] && logger -t 【GXU-Login】 "无网络，第${err}次尝试登录" && return 0
     logger -t 【GXU-Login】 "无网络，准备重启WAN"
     ;;
@@ -118,6 +126,7 @@ while [ 1 ]; do
     ;;
     offline)
     ! do_login && restart_wan
+    ##以下两行区别在于断网后是否执行一次登出，个人实验觉得不登出效果比较好
     #$(return $changed) && do_logout && changed=1
     $(return $changed) && changed=1
     ;;

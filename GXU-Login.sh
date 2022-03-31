@@ -13,6 +13,8 @@ isp=telecom
 timeout=3
 ##最大尝试次数（重启WAN或者重启路由器重置计数）
 max_try=3
+##连网后检测间隔（s）
+check_time=5
 
 restart_wan() {
   if ! $(return $restarted); then
@@ -116,7 +118,7 @@ while [ 1 ]; do
   case $status in
     online)
     if check_login; then
-      sleep 5
+      sleep $check_time
     else
       status='offline'
       changed=0

@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# Author: TimeFlyingAway <https://github.com/TimeFlyingAway/GXU-Login>
+
 logger -t 【GXU-Login】 "开始运行"
 
 ##校园网账号（学号、工号）
